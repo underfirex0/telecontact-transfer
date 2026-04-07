@@ -1,0 +1,57 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: businesses
+    // Fields: businessName, city, sector, source, createdAt, updatedAt
+    //
+    // Collection: leads
+    // Fields: businessId, businessName, city, category, visitorPhone, sourceChannel, initialMessage, 
+    //         selectedPrimaryOption, selectedPrimaryOptionLabel, detectedName, hasName, score, 
+    //         scoreLabel, status, conversationState, createdAt, updatedAt
+    //
+    // Sub-collection: leads/{leadId}/messages
+    // Fields: leadId, direction, senderType, messageType, content, selectedOptionId, selectedOptionLabel, createdAt
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.email == "soukartmorocco@gmail.com" && request.auth.token.email_verified == true);
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    // Internal UI access: Only authenticated admins can read/write data
+    // Since this is an internal tool, we lock it down to the admin email.
+    
+    match /businesses/{businessId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /leads/{leadId} {
+      allow read, write: if isAdmin();
+      
+      match /messages/{messageId} {
+        allow read, write: if isAdmin();
+      }
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "entities": {
+    "Business": {
+      "title": "Business",
+      "description": "A business entity extracted from WhatsApp messages.",
+      "type": "object",
+      "properties": {
+        "businessName": { "type": "string" },
+        "city": { "type": "string" },
+        "sector": { "type": "string" },
+        "source": { "type": "string", "enum": ["inbound_whatsapp"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["businessName", "city", "source", "createdAt", "updatedAt"]
+    },
+    "Lead": {
+      "title": "Lead",
+      "description": "A lead generated from a WhatsApp conversation.",
+      "type": "object",
+      "properties": {
+        "businessId": { "type": "string" },
+        "businessName": { "type": "string" },
+        "city": { "type": "string" },
+        "category": { "type": "string" },
+        "visitorPhone": { "type": "string" },
+        "sourceChannel": { "type": "string", "enum": ["whatsapp"] },
+        "initialMessage": { "type": "string" },
+        "selectedPrimaryOption": { "type": "string" },
+        "selectedPrimaryOptionLabel": { "type": "string" },
+        "detectedName": { "type": "string" },
+        "hasName": { "type": "boolean" },
+        "score": { "type": "integer" },
+        "scoreLabel": { "type": "string" },
+        "status": { "type": "string" },
+        "conversationState": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["visitorPhone", "sourceChannel", "score", "status", "conversationState", "createdAt", "updatedAt"]
+    },
+    "LeadMessage": {
+      "title": "LeadMessage",
+      "description": "A message within a lead's conversation history.",
+      "type": "object",
+      "properties": {
+        "leadId": { "type": "string" },
+        "direction": { "type": "string", "enum": ["inbound", "outbound"] },
+        "senderType": { "type": "string", "enum": ["visitor", "system"] },
+        "messageType": { "type": "string", "enum": ["text", "interactive_reply"] },
+        "content": { "type": "string" },
+        "selectedOptionId": { "type": "string" },
+        "selectedOptionLabel": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["leadId", "direction", "senderType", "messageType", "content", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/businesses/{businessId}": {
+      "schema": "Business",
+      "description": "Collection of businesses."
+    },
+    "/leads/{leadId}": {
+      "schema": "Lead",
+      "description": "Collection of leads."
+    },
+    "/leads/{leadId}/messages/{messageId}": {
+      "schema": "LeadMessage",
+      "description": "Sub-collection of messages for a lead."
+    }
+  }
+}
